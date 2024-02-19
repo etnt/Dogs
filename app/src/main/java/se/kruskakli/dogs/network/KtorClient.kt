@@ -32,12 +32,14 @@ class KtorClient(
         }
     }
 
-    //private var characterCache = mutableMapOf<Int, Character>()
+    private var breedCache = mutableMapOf<String, BreedsItem>()
 
     suspend fun getRandomBreed(): ApiOperation<BreedsItem> {
         return safeApiCall {
             val response: List<BreedsItem> = client.get("").body()
-            response.first()
+            val breedItem = response.first()
+            breedCache[breedItem.breeds.get(0).name] = breedItem
+            breedItem
         }
     }
 
