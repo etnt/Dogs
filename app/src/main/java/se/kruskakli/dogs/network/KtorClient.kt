@@ -14,6 +14,8 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import se.kruskakli.dogs.data.Breeds
 import se.kruskakli.dogs.data.BreedsItem
+import se.kruskakli.dogs.domain.BreedUi
+import se.kruskakli.dogs.domain.toBreedUi
 
 class KtorClient(
     api_key: String
@@ -32,14 +34,14 @@ class KtorClient(
         }
     }
 
-    private var breedCache = mutableMapOf<String, BreedsItem>()
+    private var breedCache = mutableMapOf<String, BreedUi>()
 
-    suspend fun getRandomBreed(): ApiOperation<BreedsItem> {
+    suspend fun getRandomBreed(): ApiOperation<BreedUi> {
         return safeApiCall {
             val response: List<BreedsItem> = client.get("").body()
-            val breedItem = response.first()
-            breedCache[breedItem.breeds.get(0).name] = breedItem
-            breedItem
+            val breed = response.first().toBreedUi()
+            breedCache[breed.name] = breed
+            breed
         }
     }
 
