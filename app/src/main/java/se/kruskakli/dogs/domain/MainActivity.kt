@@ -1,54 +1,20 @@
 package se.kruskakli.dogs.domain
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import se.kruskakli.dogs.data.BreedsItem
+import androidx.lifecycle.viewmodel.compose.viewModel
 import se.kruskakli.dogs.network.KtorClient
 import se.kruskakli.dogs.ui.theme.DogsTheme
 
 class MainActivity : ComponentActivity() {
-
-    private val ktorClient = KtorClient(api_key = "live_EH6RpMtIb6ROsaKpBixAA1hBODjzZVm847Rxt8GYOweZ0DegyEhqfKveiMz6xsTv")
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
-            var breed by remember {
-                mutableStateOf<BreedUi?>(null)
-            }
-
-            LaunchedEffect(key1 = Unit, block = {
-                ktorClient.getRandomBreed().onSuccess {
-                    Log.d("MainActivity", "SUCCESS: $it")
-                    breed = it
-                }.onFailure {
-                    Log.d("MainActivity", "ERROR: $it")
-                    breed = null
-                }
-            })
-
+            val viewModel: BreedViewModel = viewModel()
+            viewModel.fetchRandomBreed()
             DogsTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Text("Breed: ${breed?.let{it} ?: "Loading..."}")
-                }
+                Navigation(viewModel)
             }
         }
     }
