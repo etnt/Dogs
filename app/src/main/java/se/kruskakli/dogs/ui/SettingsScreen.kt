@@ -7,7 +7,8 @@ import se.kruskakli.dogs.domain.BreedViewModel
 
 @Composable
 fun SettingsScreen(
-    viewModel: BreedViewModel
+    viewModel: BreedViewModel,
+    navController: NavController
 ) {
     Text("Settings")
 }

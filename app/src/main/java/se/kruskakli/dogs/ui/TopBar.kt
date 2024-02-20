@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,9 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import se.kruskakli.dogs.data.Screen
 import se.kruskakli.dogs.domain.BreedViewModel
 import se.kruskakli.dogs.domain.MainIntent
+import se.kruskakli.dogs.domain.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

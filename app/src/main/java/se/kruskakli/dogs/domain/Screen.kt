@@ -1,4 +1,4 @@
-package se.kruskakli.dogs.data
+package se.kruskakli.dogs.domain
 
 sealed class Screen(val route: String) {
     object BreedScreen : Screen("main_screen")
