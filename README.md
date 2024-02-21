@@ -10,10 +10,10 @@ The purpose with this app was to explore a number of things:
 * Proper Navigation
 * The use of the ROOM database
 
-The app organized according to the MVI principle, which means:
+The app is organized according to the MVI principle, which means:
 
 * The UI observes changes to any data it depends on and re-renders accordingly.
-* The UI signals signals any interaction with the Domain layer via an Intent
+* The UI signals any interaction with the Domain layer via an Intent
 which basically is an action telling the Domain layer what the User want to do.
 * The Domain layer exist in between the UI and Data layer. It contains the actual
 machinery (business logic) that connects the user interactions with the underlying
