@@ -9,6 +9,7 @@ The purpose with this app was to explore a number of things:
 * The use of the Ktor http client
 * Proper Navigation
 * The use of the ROOM database
+* The use of Hilt dependency injection
 
 The app is organized according to the MVI principle, which means:
 
@@ -30,4 +31,9 @@ Was developed with the help of the Github Copilot.
 
 ## Room DB
 
-TBD
+By watching the "Beginner Guide for Room" episode from the YT channel of Philipp Lackner and
+"ROOM Database - #1 Create Database Schema" from YT channel by Stevdza-San.
+
+## Using Hilt
+
+Again, by watching the 15:th season of the YT channel `The Android Factory` and with help from the Copilot.

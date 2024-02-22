@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +17,11 @@ import se.kruskakli.dogs.db.BreedRepository
 import se.kruskakli.dogs.db.BreedInfo
 import se.kruskakli.dogs.db.Favorites
 import se.kruskakli.dogs.network.KtorClient
+import javax.inject.Inject
 
-class BreedViewModel(
+
+@HiltViewModel
+class BreedViewModel @Inject constructor(
     private val dao: BreedDao
 ) : ViewModel() {
 
