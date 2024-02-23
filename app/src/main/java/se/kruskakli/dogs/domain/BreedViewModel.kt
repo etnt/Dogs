@@ -26,14 +26,7 @@ class BreedViewModel @Inject constructor(
     private val dao: BreedDao
 ) : ViewModel() {
 
-    //private val readAllFavorites: Flow<List<Favorites>>
     private val breedRepository = BreedRepository(dao)
-
-    //init {
-    //    val breedDao = BreedDatabase.getDatabase(application).breedDao()
-    //    breedRepository = BreedRepository(breedDao)
-    //    readAllFavorites = breedRepository.readAllFavorites
-    //}
 
     fun addBreed(breed: BreedInfo) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -47,6 +40,9 @@ class BreedViewModel @Inject constructor(
     private val _currentBreed = MutableStateFlow<BreedUi?>(null)
     val currentBreed: StateFlow<BreedUi?> = _currentBreed.asStateFlow()
 
+    private val _limitCounter = MutableStateFlow<Int>(10)
+    val limitCounter: StateFlow<Int> = _limitCounter.asStateFlow()
+
     private val _navigateToSettings = MutableStateFlow(false)
     val navigateToSettings: StateFlow<Boolean> = _navigateToSettings.asStateFlow()
 
@@ -55,8 +51,13 @@ class BreedViewModel @Inject constructor(
     }
 
     fun fetchRandomBreed() {
+        if (_limitCounter.value == 0) {
+            _navigateToSettings.value = true
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             ktorClient.getRandomBreed().onSuccess {
+                _limitCounter.value -= 1
                 addBreed(
                     BreedInfo(
                         name = it.name,
