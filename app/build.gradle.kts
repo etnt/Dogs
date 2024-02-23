@@ -1,3 +1,5 @@
+import org.gradle.api.GradleException
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -9,6 +11,13 @@ plugins {
 
 apply(plugin = "com.android.application")
 apply(plugin =  "com.google.dagger.hilt.android")
+
+// Accessing API key from gradle.properties
+val dogsApiKey = project.findProperty("DOGS_API_KEY")
+
+if (dogsApiKey == null) {
+    throw GradleException("API key not found. Define DOGS_API_KEY in your gradle.properties file.")
+}
 
 android {
     namespace = "se.kruskakli.dogs"
@@ -25,6 +34,14 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildFeatures {
+            buildConfig = true
+            compose = true
+        }
+
+        // Assigning the API key to a BuildConfig field
+        buildConfigField("String", "API_KEY", "\"${dogsApiKey}\"")
     }
 
     buildTypes {

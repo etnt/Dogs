@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import se.kruskakli.dogs.BuildConfig
 import se.kruskakli.dogs.db.BreedDao
 import se.kruskakli.dogs.db.BreedDatabase
 import se.kruskakli.dogs.db.BreedRepository
@@ -40,8 +41,8 @@ class BreedViewModel @Inject constructor(
         }
     }
 
-
-    private val ktorClient = KtorClient(api_key = "live_EH6RpMtIb6ROsaKpBixAA1hBODjzZVm847Rxt8GYOweZ0DegyEhqfKveiMz6xsTv")
+    private val apiKey = BuildConfig.API_KEY
+    private val ktorClient = KtorClient(api_key = apiKey)
 
     private val _currentBreed = MutableStateFlow<BreedUi?>(null)
     val currentBreed: StateFlow<BreedUi?> = _currentBreed.asStateFlow()
