@@ -21,9 +21,16 @@ import se.kruskakli.dogs.network.KtorClient
 import javax.inject.Inject
 
 
+/*
+   This code defines a ViewModel that has two dependencies: BreedDao and EncryptedPreferences.
+   Hilt will automatically provide the necessary arguments (dao and encryptedPreferences)
+   when creating an instance of BreedViewModel.
+ */
+
 @HiltViewModel
 class BreedViewModel @Inject constructor(
-    private val dao: BreedDao
+    private val dao: BreedDao,
+    private val encryptedPreferences: EncryptedPreferences
 ) : ViewModel() {
 
     private val breedRepository = BreedRepository(dao)
@@ -40,7 +47,7 @@ class BreedViewModel @Inject constructor(
     private val _currentBreed = MutableStateFlow<BreedUi?>(null)
     val currentBreed: StateFlow<BreedUi?> = _currentBreed.asStateFlow()
 
-    private val _limitCounter = MutableStateFlow<Int>(10)
+    private val _limitCounter = MutableStateFlow<Int>(encryptedPreferences.readCounterValue())
     val limitCounter: StateFlow<Int> = _limitCounter.asStateFlow()
 
     private val _navigateToSettings = MutableStateFlow(false)
@@ -58,6 +65,7 @@ class BreedViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             ktorClient.getRandomBreed().onSuccess {
                 _limitCounter.value -= 1
+                encryptedPreferences.saveCounterValue(_limitCounter.value)
                 addBreed(
                     BreedInfo(
                         name = it.name,
