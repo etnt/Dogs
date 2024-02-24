@@ -47,8 +47,8 @@ fun TopBar(
                     viewModel.handleIntent(MainIntent.ShowBreed)
                     navigationController.navigate(Screen.BreedScreen.route)
                 }) {
-                    Icon(ImageVector.vectorResource(
-                        id = R.drawable.ic_dog_breeds),
+                    Icon(
+                        ImageVector.vectorResource(R.drawable.ic_dog_breeds),
                         contentDescription = "Refresh"
                     )
                 }

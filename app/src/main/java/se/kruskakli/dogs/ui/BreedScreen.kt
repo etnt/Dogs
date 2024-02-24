@@ -1,5 +1,6 @@
 package se.kruskakli.dogs.ui
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,15 +8,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -25,8 +36,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import se.kruskakli.dogs.R
 import se.kruskakli.dogs.domain.BreedViewModel
+import se.kruskakli.dogs.domain.MainIntent
 import se.kruskakli.dogs.domain.Screen
+import java.io.File
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @Composable
 fun BreedScreen(
@@ -38,7 +54,9 @@ fun BreedScreen(
     if (navigateToSettings) {
         navController.navigate(Screen.SettingsScreen.route)
     }
-    
+
+    var isFavorite by remember { mutableStateOf(false) }
+
     val currentBreed by viewModel.currentBreed.collectAsState()
     val breed = currentBreed
 
@@ -58,6 +76,19 @@ fun BreedScreen(
                     modifier = Modifier
                         .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
                 )
+                IconButton(onClick = {
+                    isFavorite = !isFavorite
+                }) {
+                    Icon(
+                        ImageVector.vectorResource(if (isFavorite) {
+                            R.drawable.ic_favorite_filled
+                        } else {
+                            R.drawable.ic_favorite_outlined
+                        }),
+                        contentDescription = "Favorite"
+
+                    )
+                }
             }
 
             Row(
@@ -88,6 +119,16 @@ fun BreedScreen(
     } ?: run {
         Text(text = "Loading...")
     }
+}
+
+@Composable
+fun DisplayLocalImage(context: Context, filename: String) {
+    val file = File(context.filesDir, filename)
+    AsyncImage(
+        model = file,
+        contentDescription = "Local Image",
+        modifier = Modifier.size(200.dp)
+    )
 }
 
 @Composable
