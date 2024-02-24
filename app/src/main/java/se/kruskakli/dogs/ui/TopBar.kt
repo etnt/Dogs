@@ -19,8 +19,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import se.kruskakli.dogs.R
 import se.kruskakli.dogs.domain.BreedViewModel
 import se.kruskakli.dogs.domain.MainIntent
 import se.kruskakli.dogs.domain.Screen
@@ -39,15 +42,26 @@ fun TopBar(
     ) {
 
         TopAppBar(
-            title = { Text(text = "My Dogs") },
+            title = {
+                IconButton(onClick = {
+                    viewModel.handleIntent(MainIntent.ShowBreed)
+                    navigationController.navigate(Screen.BreedScreen.route)
+                }) {
+                    Icon(ImageVector.vectorResource(
+                        id = R.drawable.ic_dog_breeds),
+                        contentDescription = "Refresh"
+                    )
+                }
+            },
             actions = {
+
                 Text(
                     text = "${limitCounter.value}",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
                         .padding(end = 12.dp)
                 )
-                IconButton(onClick = {
+                 IconButton(onClick = {
                     viewModel.handleIntent(MainIntent.ShowBreed)
                     navigationController.navigate(Screen.BreedScreen.route)
                 }) {
