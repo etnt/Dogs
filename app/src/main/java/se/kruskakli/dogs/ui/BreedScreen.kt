@@ -51,6 +51,8 @@ fun BreedScreen(
     ) {
     val navigateToSettings by viewModel.navigateToSettings.collectAsState()
 
+    // Handle the case when no more credits are available
+    // FIXME: we should go to the PaymentScreen
     if (navigateToSettings) {
         navController.navigate(Screen.SettingsScreen.route)
     }
@@ -78,6 +80,11 @@ fun BreedScreen(
                 )
                 IconButton(onClick = {
                     isFavorite = !isFavorite
+                    if (isFavorite) {
+                        viewModel.handleIntent(MainIntent.MarkAsFavorite)
+                    } else {
+                        viewModel.handleIntent(MainIntent.UnmarkAsFavorite)
+                    }
                 }) {
                     Icon(
                         ImageVector.vectorResource(if (isFavorite) {

@@ -35,15 +35,10 @@ class BreedViewModel @Inject constructor(
 
     private val breedRepository = BreedRepository(dao)
 
-    fun addBreed(breed: BreedInfo) {
-        viewModelScope.launch(Dispatchers.IO) {
-            breedRepository.insertBreed(breed)
-        }
-    }
-
     private val apiKey = BuildConfig.API_KEY
     private val ktorClient = KtorClient(api_key = apiKey)
 
+    // Holds the current breed that is being displayed on the screen
     private val _currentBreed = MutableStateFlow<BreedUi?>(null)
     val currentBreed: StateFlow<BreedUi?> = _currentBreed.asStateFlow()
 
@@ -52,6 +47,24 @@ class BreedViewModel @Inject constructor(
 
     private val _navigateToSettings = MutableStateFlow(false)
     val navigateToSettings: StateFlow<Boolean> = _navigateToSettings.asStateFlow()
+
+    fun addBreed(breed: BreedInfo) {
+        viewModelScope.launch(Dispatchers.IO) {
+            breedRepository.insertBreed(breed)
+        }
+    }
+
+    fun addFavorite(favorite: Favorites) {
+        viewModelScope.launch(Dispatchers.IO) {
+            breedRepository.insertFavorite(favorite)
+        }
+    }
+
+    fun deleteFavorite(id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            breedRepository.removeFavorite(id)
+        }
+    }
 
     fun resetBreed() {
         _currentBreed.value = null
@@ -100,6 +113,20 @@ class BreedViewModel @Inject constructor(
                 resetNavigation()
                 resetBreed()
                 fetchRandomBreed()
+            }
+            is MainIntent.MarkAsFavorite -> {
+                addFavorite(
+                    Favorites(
+                        id = _currentBreed.value!!.image.id,
+                        url = _currentBreed.value!!.image.url,
+                        name = _currentBreed.value!!.name,
+                        height = _currentBreed.value!!.image.height,
+                        width = _currentBreed.value!!.image.width
+                    )
+                )
+            }
+            is MainIntent.UnmarkAsFavorite -> {
+                deleteFavorite(_currentBreed.value!!.image.id)
             }
             is MainIntent.SaveSettings -> {
                 applySettings(intent.settingsData)
