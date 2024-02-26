@@ -49,6 +49,8 @@ import androidx.compose.ui.Alignment
 import androidx.navigation.NavController
 import se.kruskakli.dogs.domain.BreedViewModel
 import se.kruskakli.dogs.domain.MainIntent
+import se.kruskakli.dogs.domain.MainIntent.ShowSelectedImage
+import se.kruskakli.dogs.domain.MainIntent.ClearSelectedImage
 import se.kruskakli.dogs.domain.Screen
 
 @Composable
@@ -75,8 +77,7 @@ fun FavoriteScreen(
              .fillMaxSize()
     ) { 
         ImageGallery(images) { image ->
-            // FIXME: should go via MainIntent
-            viewModel.selectImage(image)
+            viewModel.handleIntent(MainIntent.ShowSelectedImage(image))
         }
 
         // Scrim
@@ -94,10 +95,9 @@ fun FavoriteScreen(
                 selectedImage?.let { image ->
                     FullImageDialog(
                         image = image,
-                        // FIXME: all viewModel interactions should go via MainIntent
-                        onClose = { viewModel.clearSelectedImage() },
-                        onPrevious = { if (canGoPrevious) viewModel.selectImage(images[currentIndex - 1]) },
-                        onNext = { if (canGoNext) viewModel.selectImage(images[currentIndex + 1]) },
+                        onClose = { viewModel.handleIntent(MainIntent.ClearSelectedImage) },
+                        onPrevious = { if (canGoPrevious) viewModel.handleIntent(MainIntent.ShowSelectedImage(images[currentIndex - 1])) },
+                        onNext = { if (canGoNext) viewModel.handleIntent(MainIntent.ShowSelectedImage(images[currentIndex + 1])) },
                         canGoPrevious = canGoPrevious,
                         canGoNext = canGoNext
                         ) 

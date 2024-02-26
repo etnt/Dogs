@@ -171,6 +171,12 @@ constructor(
                 deleteFavorite(_currentBreed.value!!.image.id)
                 deleteImage("${_currentBreed.value!!.image.id}.jpeg")
             }
+            is MainIntent.ShowSelectedImage -> {
+                selectImage(intent.image)
+            }
+            is MainIntent.ClearSelectedImage -> {
+                clearSelectedImage()
+            }
             is MainIntent.SaveSettings -> {
                 applySettings(intent.settingsData)
             }
