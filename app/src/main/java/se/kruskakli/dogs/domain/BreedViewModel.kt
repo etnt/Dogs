@@ -49,6 +49,7 @@ constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val favoriteFileNames = breedRepository.fetchFavoriteFileNames()
             Log.d("BreedViewModel", "Favorite file names: $favoriteFileNames")
+            _images.value = emptyList()
             favoriteFileNames.forEach { filename ->
                 imageDownloader.readImage(filename)?.let {
                     Log.d("BreedViewModel", "Favorite file names: ${it.width} x ${it.height}")
@@ -138,7 +139,6 @@ constructor(
     }
 
     fun applySettings(settingsData: SettingsData) {
-        // TODO: API key should be stored with Room.
         resetNavigation()
     }
 
