@@ -11,18 +11,27 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,6 +57,10 @@ fun FavoriteScreen(
 ) {
     val images by viewModel.images.collectAsState()
     val selectedImage by viewModel.selectedImage.collectAsState()
+
+    val currentIndex = images.indexOf(selectedImage)
+    val canGoPrevious = currentIndex > 0
+    val canGoNext = currentIndex < images.size - 1
 
     val transition = updateTransition(
         targetState = selectedImage != null,
@@ -79,9 +92,15 @@ fun FavoriteScreen(
                 exit = fadeOut(animationSpec = tween(durationMillis = 1500))
             ) {
                 selectedImage?.let { image ->
-                    FullImageDialog(image = image) {
-                        viewModel.clearSelectedImage()
-                    }
+                    FullImageDialog(
+                        image = image,
+                        // FIXME: all viewModel interactions should go via MainIntent
+                        onClose = { viewModel.clearSelectedImage() },
+                        onPrevious = { if (canGoPrevious) viewModel.selectImage(images[currentIndex - 1]) },
+                        onNext = { if (canGoNext) viewModel.selectImage(images[currentIndex + 1]) },
+                        canGoPrevious = canGoPrevious,
+                        canGoNext = canGoNext
+                        ) 
                 }
             }
         }
@@ -131,7 +150,11 @@ fun ImageThumbnail(
 @Composable
 fun FullImageDialog(
     image: Bitmap,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+    canGoPrevious: Boolean,
+    canGoNext: Boolean
 ) {
 
     Dialog(onDismissRequest = onClose) {
@@ -141,16 +164,45 @@ fun FullImageDialog(
                 .fillMaxSize()
                 .clickable(onClick = onClose)
         ) {
-            Image(
-                bitmap = image.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    //.size(DpSize(300.dp, 300.dp))
-                    .fillMaxSize()
-                    .align(Alignment.Center), // Or use screen size
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-                contentScale = ContentScale.Fit
-            )
+                // The Image!!
+                Image(
+                    bitmap = image.asImageBitmap(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit
+                )
+
+                // Row with previous and next buttons
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, top = 8.dp , end = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    // Previous button
+                    IconButton(
+                        onClick = onPrevious,
+                        enabled = canGoPrevious
+                    ) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Previous image")
+                    }
+
+                    // Next button
+                    IconButton(
+                        onClick = onNext,
+                        enabled = canGoNext
+                    ) {
+                        Icon(Icons.Filled.ArrowForward, contentDescription = "Next image")
+                    }
+                }
+            }
         }
     }
 
