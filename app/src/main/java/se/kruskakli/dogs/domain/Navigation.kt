@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import se.kruskakli.dogs.ui.BreedScreen
+import se.kruskakli.dogs.ui.FavoriteScreen
 import se.kruskakli.dogs.ui.SettingsScreen
 import se.kruskakli.dogs.ui.TopBar
 
@@ -22,6 +23,11 @@ fun Navigation(
         composable(route = Screen.SettingsScreen.route) {
             TopBar(viewModel, navController) {
                 SettingsScreen(viewModel = viewModel, navController = navController)
+            }
+        }
+        composable(route = Screen.FavoriteScreen.route) {
+            TopBar(viewModel, navController) {
+                FavoriteScreen(viewModel = viewModel)
             }
         }
     }

@@ -44,12 +44,12 @@ fun TopBar(
         TopAppBar(
             title = {
                 IconButton(onClick = {
-                    viewModel.handleIntent(MainIntent.ShowBreed)
-                    navigationController.navigate(Screen.BreedScreen.route)
+                    viewModel.handleIntent(MainIntent.ShowFavorites)
+                    navigationController.navigate(Screen.FavoriteScreen.route)
                 }) {
                     Icon(
                         ImageVector.vectorResource(R.drawable.ic_dog_breeds),
-                        contentDescription = "Refresh"
+                        contentDescription = "Favorites"
                     )
                 }
             },

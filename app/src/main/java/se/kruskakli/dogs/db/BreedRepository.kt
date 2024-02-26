@@ -6,6 +6,8 @@ class BreedRepository(private val breedDao: BreedDao) {
 
     val readAllFavorites: Flow<List<Favorites>> = breedDao.readAllFavorites()
 
+    suspend fun fetchFavoriteFileNames() : List<String> = breedDao.fetchFavoriteFileNames()
+
     fun readBreed(name: String): Flow<BreedInfo> = breedDao.readBreed(name)
 
     suspend fun insertFavorite(favorite: Favorites) {

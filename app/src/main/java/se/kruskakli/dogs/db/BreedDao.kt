@@ -16,6 +16,9 @@ interface BreedDao {
     @Query("DELETE FROM favorites WHERE id = :id")
     suspend fun removeFavorite(id: String)
 
+    @Query("SELECT id || '.jpeg' FROM favorites")
+    suspend fun fetchFavoriteFileNames(): List<String>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertBreed(breed: BreedInfo)
 
