@@ -11,6 +11,12 @@ The purpose with this app was to explore a number of things:
 * The use of the ROOM database
 * The use of Hilt dependency injection
 
+But one thing lead to another and I also had to learn things like:
+
+* Storing a counter as an Encrypted Shared Preference.
+* Storing images, marked as favorites, on local internal storage.
+* Create an image gallery with an animated zoom effect.
+
 The app is organized according to the MVI principle, which means:
 
 * The UI observes changes to any data it depends on and re-renders accordingly.
@@ -19,7 +25,7 @@ which basically is an action telling the Domain layer what the User want to do.
 * The Domain layer exist in between the UI and Data layer. It contains the actual
 machinery (business logic) that connects the user interactions with the underlying
 data model.
-* The Data layer deals with anything southbound, i.e network traffic, DB access, etc.
+* The Data layer deals with anything southbound, i.e network traffic, DB- and file access.
 
 ## Use of Ktor http client
 

@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import se.kruskakli.dogs.domain.FavoriteBreed
 
 @Dao
 interface BreedDao {
@@ -18,6 +19,9 @@ interface BreedDao {
 
     @Query("SELECT id || '.jpeg' FROM favorites")
     suspend fun fetchFavoriteFileNames(): List<String>
+
+    @Query("SELECT id || '.jpeg' AS filename, name AS breedName FROM favorites")
+    suspend fun fetchFavoriteBreeds(): List<FavoriteBreed>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertBreed(breed: BreedInfo)

@@ -86,6 +86,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.media3:media3-common:1.2.1")
     //implementation("org.testng:testng:6.9.6")
 
     val ktorVersion = "2.3.6"

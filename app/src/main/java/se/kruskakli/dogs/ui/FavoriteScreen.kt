@@ -20,38 +20,32 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.Alignment
-import androidx.navigation.NavController
 import se.kruskakli.dogs.domain.BreedViewModel
+import se.kruskakli.dogs.domain.FavoriteImage
 import se.kruskakli.dogs.domain.MainIntent
-import se.kruskakli.dogs.domain.MainIntent.ShowSelectedImage
-import se.kruskakli.dogs.domain.MainIntent.ClearSelectedImage
-import se.kruskakli.dogs.domain.Screen
 
 @Composable
 fun FavoriteScreen(
@@ -76,7 +70,7 @@ fun FavoriteScreen(
         Modifier
              .fillMaxSize()
     ) { 
-        ImageGallery(images) { image ->
+        ImageGallery(images) { image: FavoriteImage ->
             viewModel.handleIntent(MainIntent.ShowSelectedImage(image))
         }
 
@@ -95,6 +89,7 @@ fun FavoriteScreen(
                 selectedImage?.let { image ->
                     FullImageDialog(
                         image = image,
+                        unmarkAsFavorite = { viewModel.handleIntent(MainIntent.DeleteSelectedImage(image)) },
                         onClose = { viewModel.handleIntent(MainIntent.ClearSelectedImage) },
                         onPrevious = { if (canGoPrevious) viewModel.handleIntent(MainIntent.ShowSelectedImage(images[currentIndex - 1])) },
                         onNext = { if (canGoNext) viewModel.handleIntent(MainIntent.ShowSelectedImage(images[currentIndex + 1])) },
@@ -109,8 +104,8 @@ fun FavoriteScreen(
 
 @Composable
 fun ImageGallery(
-    images: List<Bitmap>,
-    onClick: (Bitmap) -> Unit
+    images: List<FavoriteImage>,
+    onClick: (FavoriteImage) -> Unit
 ) {
     LazyVerticalGrid(
         //columns = GridCells.Fixed(3),
@@ -127,8 +122,8 @@ fun ImageGallery(
 
 @Composable
 fun ImageThumbnail(
-    image: Bitmap,
-    onImageClick: (Bitmap) -> Unit
+    image: FavoriteImage,
+    onImageClick: (FavoriteImage) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -139,7 +134,7 @@ fun ImageThumbnail(
         )
     ) {
         Image(
-            bitmap = image.asImageBitmap(),
+            bitmap = image.bitmap.asImageBitmap(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.aspectRatio(1f)
@@ -149,7 +144,8 @@ fun ImageThumbnail(
 
 @Composable
 fun FullImageDialog(
-    image: Bitmap,
+    image: FavoriteImage,
+    unmarkAsFavorite: () -> Unit,
     onClose: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
@@ -170,9 +166,16 @@ fun FullImageDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                // Title
+                Text(
+                    text = image.breedName,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(8.dp)
+                )
+
                 // The Image!!
                 Image(
-                    bitmap = image.asImageBitmap(),
+                    bitmap = image.bitmap.asImageBitmap(),
                     contentDescription = null,
                     contentScale = ContentScale.Fit
                 )
@@ -192,6 +195,13 @@ fun FullImageDialog(
                         enabled = canGoPrevious
                     ) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Previous image")
+                    }
+
+                    // Favorite button
+                    IconButton(
+                        onClick = unmarkAsFavorite,
+                    ) {
+                        Icon(Icons.Filled.Favorite, contentDescription = "Unmark as favorite")
                     }
 
                     // Next button

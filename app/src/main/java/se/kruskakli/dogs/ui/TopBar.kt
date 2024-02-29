@@ -1,5 +1,6 @@
 package se.kruskakli.dogs.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -38,7 +39,7 @@ fun TopBar(
     val limitCounter = viewModel.limitCounter.collectAsState()
 
     Column(
-        modifier = androidx.compose.ui.Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
 
         TopAppBar(
@@ -62,6 +63,7 @@ fun TopBar(
                         .padding(end = 12.dp)
                 )
                  IconButton(onClick = {
+                     Log.d("TopBar", "ShowBreed")
                     viewModel.handleIntent(MainIntent.ShowBreed)
                     navigationController.navigate(Screen.BreedScreen.route)
                 }) {

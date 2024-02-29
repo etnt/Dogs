@@ -38,29 +38,27 @@ constructor(
     private val apiKey = BuildConfig.API_KEY
     private val ktorClient = KtorClient(api_key = apiKey)
 
-    private val _images = MutableStateFlow<List<Bitmap>>(emptyList())
-    val images: StateFlow<List<Bitmap>> = _images.asStateFlow()
+    private val _images = MutableStateFlow<List<FavoriteImage>>(emptyList())
+    val images: StateFlow<List<FavoriteImage>> = _images.asStateFlow()
 
-    private val _selectedImage = MutableStateFlow<Bitmap?>(null)
-    val selectedImage: StateFlow<Bitmap?> = _selectedImage.asStateFlow()
+    private val _selectedImage = MutableStateFlow<FavoriteImage?>(null)
+    val selectedImage: StateFlow<FavoriteImage?> = _selectedImage.asStateFlow()
 
     // Method to load images from the repository and update _images
     fun loadFavoriteImages() {
         viewModelScope.launch(Dispatchers.IO) {
-            val favoriteFileNames = breedRepository.fetchFavoriteFileNames()
-            Log.d("BreedViewModel", "Favorite file names: $favoriteFileNames")
+            val favoriteBreeds = breedRepository.fetchFavoriteBreeds()
             _images.value = emptyList()
-            favoriteFileNames.forEach { filename ->
+            favoriteBreeds.forEach { (filename, breedName) ->
                 imageDownloader.readImage(filename)?.let {
-                    Log.d("BreedViewModel", "Favorite file names: ${it.width} x ${it.height}")
-                    _images.value = _images.value + it
+                    _images.value = _images.value + FavoriteImage(it, filename, breedName)
                 }
             }   
         }
     }
 
     // Method to select an image
-    fun selectImage(image: Bitmap) {
+    fun selectImage(image: FavoriteImage) {
         _selectedImage.value = image
     }
 
@@ -112,6 +110,7 @@ constructor(
             ktorClient
                     .getRandomBreed()
                     .onSuccess {
+                        Log.d("BreedViewModel", "Fetched breed: $it")
                         _limitCounter.value -= 1
                         encryptedPreferences.saveCounterValue(_limitCounter.value)
                         addBreed(
@@ -145,6 +144,7 @@ constructor(
     fun handleIntent(intent: MainIntent) {
         when (intent) {
             is MainIntent.ShowBreed -> {
+                Log.d("BreedViewModel", "ShowBreed")
                 resetNavigation()
                 resetBreed()
                 fetchRandomBreed()
@@ -173,6 +173,13 @@ constructor(
             }
             is MainIntent.ShowSelectedImage -> {
                 selectImage(intent.image)
+            }
+            is MainIntent.DeleteSelectedImage -> {
+                val id = intent.image.filename.substringBefore(".jpeg")
+                deleteFavorite(id)
+                deleteImage(intent.image.filename)
+                clearSelectedImage()
+                loadFavoriteImages()
             }
             is MainIntent.ClearSelectedImage -> {
                 clearSelectedImage()
