@@ -16,5 +16,6 @@ sealed class MainIntent {
 }
 
 data class SettingsData(
-    val newApiKey: String
+    val newApiKey: String,
+    val newRequestLimit: Int
 )

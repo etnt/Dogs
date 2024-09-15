@@ -35,8 +35,10 @@ constructor(
 
     private val breedRepository = BreedRepository(dao)
 
-    private val apiKey = BuildConfig.API_KEY
-    private val ktorClient = KtorClient(api_key = apiKey)
+    private var _apiKey = MutableStateFlow(encryptedPreferences.getApiKey())
+    val apiKey: StateFlow<String> = _apiKey.asStateFlow()
+
+    private var ktorClient = KtorClient(api_key = _apiKey.value)
 
     private val _images = MutableStateFlow<List<FavoriteImage>>(emptyList())
     val images: StateFlow<List<FavoriteImage>> = _images.asStateFlow()
@@ -95,7 +97,9 @@ constructor(
         viewModelScope.launch(Dispatchers.IO) { breedRepository.removeFavorite(id) }
     }
 
+    fun getApiKey(): String = _apiKey.value
 
+    fun getLimitCounter(): Int = _limitCounter.value
 
     fun resetBreed() {
         _currentBreed.value = null
@@ -138,6 +142,11 @@ constructor(
     }
 
     fun applySettings(settingsData: SettingsData) {
+        encryptedPreferences.saveApiKey(settingsData.newApiKey)
+        encryptedPreferences.saveCounterValue(settingsData.newRequestLimit)
+        _apiKey.value = settingsData.newApiKey
+        _limitCounter.value = settingsData.newRequestLimit
+        ktorClient.updateApiKey(settingsData.newApiKey)
         resetNavigation()
     }
 

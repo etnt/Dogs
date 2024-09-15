@@ -113,7 +113,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.50")
 
     // Security library for encryption
-    implementation("androidx.security:security-crypto:1.1.0-alpha03")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // For LazyVerticalGrid
     //implementation("compose.foundation:1.0.0-alpha11")

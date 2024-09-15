@@ -17,11 +17,14 @@ import se.kruskakli.dogs.data.BreedsItem
 import se.kruskakli.dogs.domain.BreedUi
 import se.kruskakli.dogs.domain.toBreedUi
 
-class KtorClient(
-    api_key: String
-) {
-    private val client = HttpClient(OkHttp) {
-        defaultRequest { url("https://api.thedogapi.com/v1/images/search?has_breeds=1&api_key=${api_key}") }
+class KtorClient(private var api_key: String) {
+    private var client = createHttpClient()
+
+    private fun createHttpClient() = HttpClient(OkHttp) {
+        defaultRequest { 
+            url("https://api.thedogapi.com/v1/images/search?has_breeds=1")
+            header("x-api-key", api_key)
+        }
 
         install(Logging) {
             logger = Logger.SIMPLE
@@ -32,6 +35,12 @@ class KtorClient(
                 ignoreUnknownKeys = true
             })
         }
+    }
+
+    fun updateApiKey(newApiKey: String) {
+        api_key = newApiKey
+        client.close()
+        client = createHttpClient()
     }
 
     private var breedCache = mutableMapOf<String, BreedUi>()
