@@ -15,7 +15,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileNotFoundException
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class EncryptedPreferences @Inject constructor(@ApplicationContext private val context: Context) {
     fun getEncryptedSharedPreferences(): SharedPreferences {
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
