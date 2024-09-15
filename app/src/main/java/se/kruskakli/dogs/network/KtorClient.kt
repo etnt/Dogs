@@ -23,7 +23,9 @@ class KtorClient(private var api_key: String) {
     private fun createHttpClient() = HttpClient(OkHttp) {
         defaultRequest { 
             url("https://api.thedogapi.com/v1/images/search?has_breeds=1")
-            header("x-api-key", api_key)
+            headers {
+                append("x-api-key", api_key)
+            }
         }
 
         install(Logging) {
