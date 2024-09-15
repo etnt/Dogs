@@ -40,6 +40,16 @@ class EncryptedPreferences @Inject constructor(@ApplicationContext private val c
         val prefs = getEncryptedSharedPreferences()
         return prefs.getInt("counter_key", 1000)
     }
+
+    fun getApiKey(): String {
+        val prefs = getEncryptedSharedPreferences()
+        return prefs.getString("api_key", "") ?: ""
+    }
+
+    fun saveApiKey(apiKey: String) {
+        val prefs = getEncryptedSharedPreferences()
+        prefs.edit().putString("api_key", apiKey).apply()
+    }
 }
 
 class ImageDownloader @Inject constructor(@ApplicationContext private val context: Context) {
