@@ -25,12 +25,11 @@ import se.kruskakli.dogs.network.KtorClient
 */
 
 @HiltViewModel
-class BreedViewModel
-@Inject
-constructor(
-        private val dao: BreedDao,
-        private val encryptedPreferences: EncryptedPreferences,
-        private val imageDownloader: ImageDownloader
+class BreedViewModel @Inject constructor(
+    private val dao: BreedDao,
+    private val encryptedPreferences: EncryptedPreferences,
+    private val imageDownloader: ImageDownloader,
+    private val ktorClientProvider: Provider<KtorClient>
 ) : ViewModel() {
 
     private val breedRepository = BreedRepository(dao)
@@ -38,7 +37,8 @@ constructor(
     private var _apiKey = MutableStateFlow(encryptedPreferences.getApiKey())
     val apiKey: StateFlow<String> = _apiKey.asStateFlow()
 
-    private var ktorClient = KtorClient(api_key = _apiKey.value)
+    private val ktorClient: KtorClient
+        get() = ktorClientProvider.get()
 
     private val _images = MutableStateFlow<List<FavoriteImage>>(emptyList())
     val images: StateFlow<List<FavoriteImage>> = _images.asStateFlow()
