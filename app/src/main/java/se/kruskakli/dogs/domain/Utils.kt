@@ -36,7 +36,7 @@ class EncryptedPreferences @Inject constructor(@ApplicationContext private val c
 
     fun readCounterValue(): Int {
         val prefs = getEncryptedSharedPreferences()
-        return prefs.getInt("counter_key", 100)
+        return prefs.getInt("counter_key", 1000)
     }
 }
 
