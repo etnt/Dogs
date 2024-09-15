@@ -13,6 +13,6 @@ import javax.inject.Provider
 object NetworkModule {
 
     @Provides
-    fun provideKtorClient(encryptedPreferences: Provider<EncryptedPreferences>): Provider<KtorClient> =
-        Provider { KtorClient(api_key = encryptedPreferences.get().getApiKey()) }
+    fun provideKtorClient(encryptedPreferences: EncryptedPreferences): KtorClient =
+        KtorClient(api_key = encryptedPreferences.getApiKey())
 }

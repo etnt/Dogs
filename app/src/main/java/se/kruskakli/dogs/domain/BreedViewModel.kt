@@ -29,16 +29,13 @@ class BreedViewModel @Inject constructor(
     private val dao: BreedDao,
     private val encryptedPreferences: EncryptedPreferences,
     private val imageDownloader: ImageDownloader,
-    private val ktorClientProvider: Provider<KtorClient>
+    private val ktorClient: KtorClient
 ) : ViewModel() {
 
     private val breedRepository = BreedRepository(dao)
 
     private var _apiKey = MutableStateFlow(encryptedPreferences.getApiKey())
     val apiKey: StateFlow<String> = _apiKey.asStateFlow()
-
-    private val ktorClient: KtorClient
-        get() = ktorClientProvider.get()
 
     private val _images = MutableStateFlow<List<FavoriteImage>>(emptyList())
     val images: StateFlow<List<FavoriteImage>> = _images.asStateFlow()
