@@ -6,11 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import se.kruskakli.dogs.domain.BreedViewModel
 import se.kruskakli.dogs.domain.MainIntent
 
 @Composable
-fun SettingsScreen(viewModel: BreedViewModel) {
+fun SettingsScreen(
+    viewModel: BreedViewModel
+) {
     var apiKey by remember { mutableStateOf(viewModel.getApiKey()) }
     var requestLimit by remember { mutableStateOf(viewModel.getLimitCounter().toString()) }
 

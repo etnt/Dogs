@@ -22,7 +22,7 @@ fun Navigation(
         }
         composable(route = Screen.SettingsScreen.route) {
             TopBar(viewModel, navController) {
-                SettingsScreen(viewModel = viewModel, navController = navController)
+                SettingsScreen(viewModel = viewModel)
             }
         }
         composable(route = Screen.FavoriteScreen.route) {
