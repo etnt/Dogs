@@ -1,8 +1,5 @@
 package se.kruskakli.dogs.domain
 
-import android.graphics.Bitmap
-
-
 sealed class MainIntent {
     object ShowBreed : MainIntent()
     object ShowFavorites : MainIntent()
@@ -11,8 +8,8 @@ sealed class MainIntent {
     data class ShowSelectedImage(val image: FavoriteImage) : MainIntent()
     data class DeleteSelectedImage(val image: FavoriteImage) : MainIntent()
     object ClearSelectedImage : MainIntent()
-
     data class SaveSettings(val settingsData: SettingsData) : MainIntent()
+    data class UpdateApiKey(val newApiKey: String) : MainIntent()
 }
 
 data class SettingsData(

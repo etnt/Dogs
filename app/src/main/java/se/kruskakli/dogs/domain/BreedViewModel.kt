@@ -11,18 +11,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import se.kruskakli.dogs.BuildConfig
 import se.kruskakli.dogs.db.BreedDao
 import se.kruskakli.dogs.db.BreedInfo
 import se.kruskakli.dogs.db.BreedRepository
 import se.kruskakli.dogs.db.Favorites
 import se.kruskakli.dogs.network.KtorClient
-
-/*
-  This code defines a ViewModel that has two dependencies: BreedDao and EncryptedPreferences.
-  Hilt will automatically provide the necessary arguments (dao and encryptedPreferences)
-  when creating an instance of BreedViewModel.
-*/
+import se.kruskakli.dogs.domain.MainIntent
+import se.kruskakli.dogs.domain.SettingsData
+import se.kruskakli.dogs.domain.FavoriteImage
 
 @HiltViewModel
 class BreedViewModel @Inject constructor(
@@ -74,13 +70,8 @@ class BreedViewModel @Inject constructor(
     private val _limitCounter = MutableStateFlow<Int>(encryptedPreferences.readCounterValue())
     val limitCounter: StateFlow<Int> = _limitCounter.asStateFlow()
 
-    // FIXME: Indicates if the app should navigate to the payment screen.
     private val _navigateToSettings = MutableStateFlow(false)
     val navigateToSettings: StateFlow<Boolean> = _navigateToSettings.asStateFlow()
-
-    // Holds the list of favorite image filenames
-    //private val _favoriteFileNames = MutableStateFlow<List<String>>(emptyList())
-    //val favoriteFileNames: StateFlow<List<String>> = _favoriteFileNames.asStateFlow()
 
     fun addBreed(breed: BreedInfo) {
         viewModelScope.launch(Dispatchers.IO) { breedRepository.insertBreed(breed) }
@@ -96,6 +87,14 @@ class BreedViewModel @Inject constructor(
 
     fun getApiKey(): String = _apiKey.value
 
+    fun setApiKey(newApiKey: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            encryptedPreferences.saveApiKey(newApiKey)
+            _apiKey.value = newApiKey
+            ktorClient.updateApiKey(newApiKey)
+        }
+    }
+
     fun getLimitCounter(): Int = _limitCounter.value
 
     fun resetBreed() {
@@ -109,28 +108,28 @@ class BreedViewModel @Inject constructor(
         }
         viewModelScope.launch(Dispatchers.IO) {
             ktorClient
-                    .getRandomBreed()
-                    .onSuccess {
-                        Log.d("BreedViewModel", "Fetched breed: $it")
-                        _limitCounter.value -= 1
-                        encryptedPreferences.saveCounterValue(_limitCounter.value)
-                        addBreed(
-                                BreedInfo(
-                                        name = it.name,
-                                        bred_for = it.bred_for,
-                                        breed_group = it.bred_for,
-                                        height = it.height,
-                                        life_span = it.life_span,
-                                        temperament = it.temperament,
-                                        weight = it.weight
-                                )
+                .getRandomBreed()
+                .onSuccess {
+                    Log.d("BreedViewModel", "Fetched breed: $it")
+                    _limitCounter.value -= 1
+                    encryptedPreferences.saveCounterValue(_limitCounter.value)
+                    addBreed(
+                        BreedInfo(
+                            name = it.name,
+                            bred_for = it.bred_for,
+                            breed_group = it.bred_for,
+                            height = it.height,
+                            life_span = it.life_span,
+                            temperament = it.temperament,
+                            weight = it.weight
                         )
-                        _currentBreed.value = it
-                    }
-                    .onFailure {
-                        _currentBreed.value = null
-                        _navigateToSettings.value = true
-                    }
+                    )
+                    _currentBreed.value = it
+                }
+                .onFailure {
+                    _currentBreed.value = null
+                    _navigateToSettings.value = true
+                }
         }
     }
 
@@ -160,17 +159,17 @@ class BreedViewModel @Inject constructor(
             }
             is MainIntent.MarkAsFavorite -> {
                 downloadImage(
-                        _currentBreed.value!!.image.url,
-                        "${_currentBreed.value!!.image.id}.jpeg"
+                    _currentBreed.value!!.image.url,
+                    "${_currentBreed.value!!.image.id}.jpeg"
                 )
                 addFavorite(
-                        Favorites(
-                                id = _currentBreed.value!!.image.id,
-                                url = _currentBreed.value!!.image.url,
-                                name = _currentBreed.value!!.name,
-                                height = _currentBreed.value!!.image.height,
-                                width = _currentBreed.value!!.image.width
-                        )
+                    Favorites(
+                        id = _currentBreed.value!!.image.id,
+                        url = _currentBreed.value!!.image.url,
+                        name = _currentBreed.value!!.name,
+                        height = _currentBreed.value!!.image.height,
+                        width = _currentBreed.value!!.image.width
+                    )
                 )
             }
             is MainIntent.UnmarkAsFavorite -> {
@@ -192,6 +191,9 @@ class BreedViewModel @Inject constructor(
             }
             is MainIntent.SaveSettings -> {
                 applySettings(intent.settingsData)
+            }
+            is MainIntent.UpdateApiKey -> {
+                setApiKey(intent.newApiKey)
             }
         }
     }

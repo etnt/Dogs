@@ -7,7 +7,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
+import androidx.security.crypto.MasterKey
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
@@ -19,47 +19,44 @@ import javax.inject.Singleton
 
 @Singleton
 class EncryptedPreferences @Inject constructor(@ApplicationContext private val context: Context) {
-    fun getEncryptedSharedPreferences(): SharedPreferences {
-        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+    private val masterKey = MasterKey.Builder(context)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
 
-        return EncryptedSharedPreferences.create(
-                "encrypted_preferences",
-                masterKeyAlias,
-                context,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    private val sharedPreferences: SharedPreferences by lazy {
+        EncryptedSharedPreferences.create(
+            context,
+            "encrypted_preferences",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
     }
 
     fun saveCounterValue(counter: Int) {
-        val prefs = getEncryptedSharedPreferences()
-        prefs.edit().putInt("counter_key", counter).apply()
+        sharedPreferences.edit().putInt("counter_key", counter).apply()
     }
 
     fun readCounterValue(): Int {
-        val prefs = getEncryptedSharedPreferences()
-        return prefs.getInt("counter_key", 1000)
+        return sharedPreferences.getInt("counter_key", 1000)
     }
 
     fun getApiKey(): String {
-        val prefs = getEncryptedSharedPreferences()
-        return prefs.getString("api_key", "") ?: ""
+        return sharedPreferences.getString("api_key", "") ?: ""
     }
 
     fun saveApiKey(apiKey: String) {
-        val prefs = getEncryptedSharedPreferences()
-        prefs.edit().putString("api_key", apiKey).apply()
+        sharedPreferences.edit().putString("api_key", apiKey).apply()
     }
 }
 
 class ImageDownloader @Inject constructor(@ApplicationContext private val context: Context) {
     suspend fun downloadAndStoreImage(imageUrl: String, filename: String) {
         val imageLoader = ImageLoader(context)
-        val request =
-                ImageRequest.Builder(context)
-                        .data(imageUrl)
-                        .allowHardware(false) // Important for accessing the bitmap
-                        .build()
+        val request = ImageRequest.Builder(context)
+            .data(imageUrl)
+            .allowHardware(false) // Important for accessing the bitmap
+            .build()
 
         val result = imageLoader.execute(request)
 
@@ -83,12 +80,6 @@ class ImageDownloader @Inject constructor(@ApplicationContext private val contex
     fun readImage(filename: String): Bitmap? {
         logFilesInInternalStorage()
         
-        //val file = File(context.filesDir, filename)
-        //if (!file.exists()) {
-        //    Log.d("ImageDownloader", "File does not exist: $filename")
-        //    return null
-        //}
-
         return try {
             context.openFileInput(filename).use { 
                 BitmapFactory.decodeStream(it)
