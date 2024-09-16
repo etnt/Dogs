@@ -42,6 +42,10 @@ class BreedViewModel @Inject constructor(
     private val _favoriteCount = MutableStateFlow(0)
     val favoriteCount: StateFlow<Int> = _favoriteCount.asStateFlow()
 
+    init {
+        loadFavoriteImages()
+    }
+
     // Method to load images from the repository and update _images
     fun loadFavoriteImages() {
         viewModelScope.launch(Dispatchers.IO) {
