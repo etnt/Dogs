@@ -4,6 +4,12 @@
 This Android app lets you retrieve some dog breed info by making
 use of the API: [thedogapi.com](https://www.thedogapi.com/).
 
+Download the latest release: [1.0.0](https://github.com/etnt/Dogs/releases/tag/v1.0.0)
+
+To use, it get your (free) API key [here](https://www.thedogapi.com/)
+
+## Purpose
+
 The purpose with this app was to explore a number of things:
 
 * The use of the Ktor http client
@@ -26,6 +32,14 @@ which basically is an action telling the Domain layer what the User want to do.
 machinery (business logic) that connects the user interactions with the underlying
 data model.
 * The Data layer deals with anything southbound, i.e network traffic, DB- and file access.
+
+## Screenshots
+
+<div style="display: flex; justify-content: space-around;">
+    <img src="./screenshots/dogs1.jpg" width="200" alt="Screenshot 1">
+    <img src="./screenshots/dogs2.jpg" width="200" alt="Screenshot 2">
+    <img src="./screenshots/dogs3.jpg" width="200" alt="Screenshot 3">
+</div>
 
 ## Use of Ktor http client
 
