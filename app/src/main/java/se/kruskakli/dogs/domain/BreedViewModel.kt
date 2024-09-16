@@ -39,6 +39,9 @@ class BreedViewModel @Inject constructor(
     private val _selectedImage = MutableStateFlow<FavoriteImage?>(null)
     val selectedImage: StateFlow<FavoriteImage?> = _selectedImage.asStateFlow()
 
+    private val _favoriteCount = MutableStateFlow(0)
+    val favoriteCount: StateFlow<Int> = _favoriteCount.asStateFlow()
+
     // Method to load images from the repository and update _images
     fun loadFavoriteImages() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -48,7 +51,8 @@ class BreedViewModel @Inject constructor(
                 imageDownloader.readImage(filename)?.let {
                     _images.value = _images.value + FavoriteImage(it, filename, breedName)
                 }
-            }   
+            }
+            _favoriteCount.value = _images.value.size
         }
     }
 
@@ -66,10 +70,6 @@ class BreedViewModel @Inject constructor(
     private val _currentBreed = MutableStateFlow<BreedUi?>(null)
     val currentBreed: StateFlow<BreedUi?> = _currentBreed.asStateFlow()
 
-    // Holds the number of outstanding requests that remains.
-    private val _limitCounter = MutableStateFlow<Int>(encryptedPreferences.readCounterValue())
-    val limitCounter: StateFlow<Int> = _limitCounter.asStateFlow()
-
     private val _navigateToSettings = MutableStateFlow(false)
     val navigateToSettings: StateFlow<Boolean> = _navigateToSettings.asStateFlow()
 
@@ -78,11 +78,17 @@ class BreedViewModel @Inject constructor(
     }
 
     fun addFavorite(favorite: Favorites) {
-        viewModelScope.launch(Dispatchers.IO) { breedRepository.insertFavorite(favorite) }
+        viewModelScope.launch(Dispatchers.IO) {
+            breedRepository.insertFavorite(favorite)
+            _favoriteCount.value += 1
+        }
     }
 
     fun deleteFavorite(id: String) {
-        viewModelScope.launch(Dispatchers.IO) { breedRepository.removeFavorite(id) }
+        viewModelScope.launch(Dispatchers.IO) {
+            breedRepository.removeFavorite(id)
+            _favoriteCount.value -= 1
+        }
     }
 
     fun getApiKey(): String = _apiKey.value
@@ -95,24 +101,16 @@ class BreedViewModel @Inject constructor(
         }
     }
 
-    fun getLimitCounter(): Int = _limitCounter.value
-
     fun resetBreed() {
         _currentBreed.value = null
     }
 
     fun fetchRandomBreed() {
-        if (_limitCounter.value == 0) {
-            _navigateToSettings.value = true
-            return
-        }
         viewModelScope.launch(Dispatchers.IO) {
             ktorClient
                 .getRandomBreed()
                 .onSuccess {
                     Log.d("BreedViewModel", "Fetched breed: $it")
-                    _limitCounter.value -= 1
-                    encryptedPreferences.saveCounterValue(_limitCounter.value)
                     addBreed(
                         BreedInfo(
                             name = it.name,
@@ -139,9 +137,7 @@ class BreedViewModel @Inject constructor(
 
     fun applySettings(settingsData: SettingsData) {
         encryptedPreferences.saveApiKey(settingsData.newApiKey)
-        encryptedPreferences.saveCounterValue(settingsData.newRequestLimit)
         _apiKey.value = settingsData.newApiKey
-        _limitCounter.value = settingsData.newRequestLimit
         ktorClient.updateApiKey(settingsData.newApiKey)
         resetNavigation()
     }

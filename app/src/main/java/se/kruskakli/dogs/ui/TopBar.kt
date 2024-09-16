@@ -36,7 +36,7 @@ fun TopBar(
     navigationController: NavController,
     bodyContent: @Composable () -> Unit
 ) {
-    val limitCounter = viewModel.limitCounter.collectAsState()
+    val favoriteCounter = viewModel.favoriteCount.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -57,7 +57,7 @@ fun TopBar(
             actions = {
 
                 Text(
-                    text = "${limitCounter.value}",
+                    text = "${favoriteCounter.value}",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
                         .padding(end = 12.dp)

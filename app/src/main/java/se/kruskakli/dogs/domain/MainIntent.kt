@@ -13,6 +13,7 @@ sealed class MainIntent {
 }
 
 data class SettingsData(
-    val newApiKey: String,
-    val newRequestLimit: Int
+    val newApiKey: String
 )
+
+// FavoriteImage is likely defined elsewhere, so we'll leave it out here
