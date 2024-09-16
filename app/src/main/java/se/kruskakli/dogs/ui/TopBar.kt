@@ -56,19 +56,22 @@ fun TopBar(
             },
             actions = {
 
+                IconButton(
+                    onClick = {
+                        Log.d("TopBar", "ShowBreed")
+                        viewModel.handleIntent(MainIntent.ShowBreed)
+                        navigationController.navigate(Screen.BreedScreen.route)
+                    },
+                    modifier = Modifier.padding(end = 12.dp)
+                ){
+                    Icon(Icons.Filled.Refresh, contentDescription = "Refresh")
+                }
                 Text(
                     text = "${favoriteCounter.value}",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
                         .padding(end = 12.dp)
                 )
-                 IconButton(onClick = {
-                     Log.d("TopBar", "ShowBreed")
-                    viewModel.handleIntent(MainIntent.ShowBreed)
-                    navigationController.navigate(Screen.BreedScreen.route)
-                }) {
-                    Icon(Icons.Filled.Refresh, contentDescription = "Refresh")
-                }
                 IconButton(onClick = {
                     navigationController.navigate(Screen.SettingsScreen.route)
                 }) {
